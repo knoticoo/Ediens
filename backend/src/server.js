@@ -25,6 +25,7 @@ const postsRoutes = require('./routes/posts');
 const claimsRoutes = require('./routes/claims');
 const messagesRoutes = require('./routes/messages');
 const usersRoutes = require('./routes/users');
+const staticRoutes = require('./routes/static');
 
 // Import database connection
 const sequelize = require('./database/connection');
@@ -100,6 +101,9 @@ app.use('/api/posts', postsRoutes);
 app.use('/api/claims', claimsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/users', usersRoutes);
+
+// Static file serving for uploads
+app.use('/uploads', staticRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
