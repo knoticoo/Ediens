@@ -1,0 +1,224 @@
+// [EDIT] - 2024-01-15 - Created FoodPost model - Ediens Team
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../database/connection');
+
+const FoodPost = sequelize.define('FoodPost', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      len: [3, 100]
+    }
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+    validate: {
+      len: [10, 1000]
+    }
+  },
+  category: {
+    type: DataTypes.ENUM('fresh', 'cooked', 'bakery', 'packaged', 'frozen', 'dairy', 'other'),
+    allowNull: false
+  },
+  subcategory: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+    validate: {
+      min: 1
+    }
+  },
+  unit: {
+    type: DataTypes.ENUM('piece', 'kg', 'g', 'liter', 'ml', 'portion', 'box', 'bag'),
+    allowNull: false,
+    defaultValue: 'piece'
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    defaultValue: 0.00,
+    validate: {
+      min: 0
+    }
+  },
+  isFree: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  originalPrice: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true
+  },
+  discountPercentage: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
+  images: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
+  },
+  location: {
+    type: DataTypes.GEOMETRY('POINT'),
+    allowNull: false
+  },
+  address: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  city: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  pickupInstructions: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  expiryDate: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  isExpired: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  urgency: {
+    type: DataTypes.ENUM('low', 'medium', 'high', 'critical'),
+    defaultValue: 'medium'
+  },
+  allergens: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
+  },
+  dietaryInfo: {
+    type: DataTypes.ARRAY(DataTypes.ENUM('vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher')),
+    defaultValue: []
+  },
+  storageInstructions: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  status: {
+    type: DataTypes.ENUM('available', 'reserved', 'claimed', 'expired', 'cancelled'),
+    defaultValue: 'available'
+  },
+  maxReservations: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  currentReservations: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  isBusinessPost: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  businessHours: {
+    type: DataTypes.JSONB,
+    allowNull: true
+  },
+  tags: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
+  },
+  viewCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  isFeatured: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  }
+}, {
+  tableName: 'food_posts',
+  hooks: {
+    beforeCreate: (post) => {
+      // Set urgency based on expiry date
+      const now = new Date();
+      const expiry = new Date(post.expiryDate);
+      const hoursUntilExpiry = (expiry - now) / (1000 * 60 * 60);
+      
+      if (hoursUntilExpiry <= 2) post.urgency = 'critical';
+      else if (hoursUntilExpiry <= 24) post.urgency = 'high';
+      else if (hoursUntilExpiry <= 72) post.urgency = 'medium';
+      else post.urgency = 'low';
+      
+      // Set isFree based on price
+      post.isFree = post.price === 0;
+      
+      // Calculate discount percentage if original price is provided
+      if (post.originalPrice && post.originalPrice > post.price) {
+        post.discountPercentage = Math.round(((post.originalPrice - post.price) / post.originalPrice) * 100);
+      }
+    },
+    beforeUpdate: (post) => {
+      // Update urgency and expiry status
+      if (post.changed('expiryDate')) {
+        const now = new Date();
+        const expiry = new Date(post.expiryDate);
+        const hoursUntilExpiry = (expiry - now) / (1000 * 60 * 60);
+        
+        if (hoursUntilExpiry <= 0) {
+          post.urgency = 'critical';
+          post.isExpired = true;
+          post.status = 'expired';
+        } else if (hoursUntilExpiry <= 2) post.urgency = 'critical';
+        else if (hoursUntilExpiry <= 24) post.urgency = 'high';
+        else if (hoursUntilExpiry <= 72) post.urgency = 'medium';
+        else post.urgency = 'low';
+      }
+    }
+  }
+});
+
+// Instance methods
+FoodPost.prototype.isAvailable = function() {
+  return this.status === 'available' && !this.isExpired;
+};
+
+FoodPost.prototype.canBeReserved = function() {
+  if (!this.isAvailable()) return false;
+  if (this.maxReservations && this.currentReservations >= this.maxReservations) return false;
+  return true;
+};
+
+FoodPost.prototype.getTimeUntilExpiry = function() {
+  const now = new Date();
+  const expiry = new Date(this.expiryDate);
+  const diff = expiry - now;
+  
+  if (diff <= 0) return 'Expired';
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? 's' : ''}`;
+  } else if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else {
+    return `${minutes}m`;
+  }
+};
+
+FoodPost.prototype.incrementViewCount = function() {
+  this.viewCount += 1;
+  return this.save();
+};
+
+module.exports = FoodPost;
