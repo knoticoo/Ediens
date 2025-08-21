@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 
 // Context Providers
 import { AuthProvider, useAuth } from '@store/AuthContext';
+import { NotificationProvider } from '@store/NotificationContext';
 
 // Layout Components
 import Header from '@components/layout/Header';
@@ -28,6 +29,7 @@ import LeaderboardPage from '@pages/LeaderboardPage';
 import MessagesPage from '@pages/MessagesPage';
 import SearchPage from '@pages/SearchPage';
 import NotFoundPage from '@pages/NotFoundPage';
+import NotificationDemo from '@components/demo/NotificationDemo';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -45,86 +47,88 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/trending" element={<TrendingPage />} />
-                <Route path="/leaderboard" element={<LeaderboardPage />} />
-                
-                {/* Protected Routes */}
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/create-post" element={
-                  <ProtectedRoute>
-                    <CreatePostPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/map" element={
-                  <ProtectedRoute>
-                    <MapPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/messages" element={
-                  <ProtectedRoute>
-                    <MessagesPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/messages/:userId" element={
-                  <ProtectedRoute>
-                    <MessagesPage />
-                  </ProtectedRoute>
-                } />
-                
-                {/* OAuth Callback Routes */}
-                <Route path="/auth/callback" element={<OAuthCallback />} />
-                <Route path="/auth/error" element={<OAuthError />} />
-                
-                {/* 404 Route */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-          
-          {/* Toast Notifications */}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-              success: {
-                duration: 3000,
-                iconTheme: {
-                  primary: '#10B981',
-                  secondary: '#fff',
+          <NotificationProvider>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/trending" element={<TrendingPage />} />
+                  <Route path="/leaderboard" element={<LeaderboardPage />} />
+                  <Route path="/demo/notifications" element={<NotificationDemo />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <DashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/create-post" element={
+                    <ProtectedRoute>
+                      <CreatePostPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/map" element={
+                    <ProtectedRoute>
+                      <MapPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/messages" element={
+                    <ProtectedRoute>
+                      <MessagesPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/messages/:userId" element={
+                    <ProtectedRoute>
+                      <MessagesPage />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* OAuth Callback Routes */}
+                  <Route path="/auth/callback" element={<OAuthCallback />} />
+                  <Route path="/auth/error" element={<OAuthError />} />
+                  
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+            
+            {/* Toast Notifications */}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
                 },
-              },
-              error: {
-                duration: 5000,
-                iconTheme: {
-                  primary: '#EF4444',
-                  secondary: '#fff',
+                success: {
+                  duration: 3000,
+                  iconTheme: {
+                    primary: '#10B981',
+                    secondary: '#fff',
                 },
-              },
-            }}
-          />
+                error: {
+                  duration: 5000,
+                  iconTheme: {
+                    primary: '#EF4444',
+                    secondary: '#fff',
+                  },
+                },
+              }}
+            />
+          </NotificationProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>
