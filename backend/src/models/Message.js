@@ -23,9 +23,21 @@ const Message = sequelize.define('Message', {
     type: DataTypes.STRING,
     allowNull: true
   },
-  location: {
-    type: DataTypes.GEOMETRY('POINT'),
-    allowNull: true
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: true,
+    validate: {
+      min: -90,
+      max: 90
+    }
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: true,
+    validate: {
+      min: -180,
+      max: 180
+    }
   },
   isRead: {
     type: DataTypes.BOOLEAN,

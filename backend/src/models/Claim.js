@@ -64,9 +64,21 @@ const Claim = sequelize.define('Claim', {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
-  pickupLocation: {
-    type: DataTypes.GEOMETRY('POINT'),
-    allowNull: true
+  pickupLatitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: true,
+    validate: {
+      min: -90,
+      max: 90
+    }
+  },
+  pickupLongitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: true,
+    validate: {
+      min: -180,
+      max: 180
+    }
   },
   pickupAddress: {
     type: DataTypes.TEXT,
