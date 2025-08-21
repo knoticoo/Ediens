@@ -59,11 +59,11 @@
   }
   
   .btn-primary {
-    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 shadow-soft;
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 shadow-md;
   }
   
   .btn-secondary {
-    @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-500 shadow-soft;
+    @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-500 shadow-md;
   }
   
   .btn-outline {
@@ -88,7 +88,7 @@
   
   /* Card Components */
   .card {
-    @apply bg-white rounded-xl shadow-soft border border-gray-100 overflow-hidden;
+    @apply bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden;
   }
   
   .card-header {
