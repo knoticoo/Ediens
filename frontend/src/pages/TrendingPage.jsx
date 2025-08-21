@@ -5,7 +5,7 @@ import { useAuth } from '@store/AuthContext';
 import { useQuery } from 'react-query';
 import { 
   TrendingUp, 
-  Fire, 
+  Flame, 
   Star, 
   Heart, 
   Eye, 
@@ -311,7 +311,7 @@ const TrendingPage = () => {
                     Trending Food Posts
                   </h3>
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <Fire className="w-4 h-4 text-orange-500" />
+                    <Flame className="w-4 h-4 text-orange-500" />
                     <span>Based on views, claims, and engagement</span>
                   </div>
                 </div>
