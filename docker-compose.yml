@@ -5,16 +5,15 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: ediens_postgres
+    container_name: ediens-postgres-1
     environment:
       POSTGRES_DB: ediens_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ediens_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ediens_password}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - ediens_network
     restart: unless-stopped
