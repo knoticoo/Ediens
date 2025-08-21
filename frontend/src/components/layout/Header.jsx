@@ -9,12 +9,12 @@ import {
   User, 
   LogOut, 
   Settings, 
-  Bell,
   Menu,
   X,
   Heart,
   MessageCircle
 } from 'lucide-react';
+import NotificationDropdown from './NotificationDropdown';
 
 const Header = () => {
   const { user, logout } = useAuth();
