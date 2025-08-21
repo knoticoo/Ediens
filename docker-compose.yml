@@ -1,28 +1,32 @@
-# [EDIT] - 2024-01-15 - Created Docker Compose configuration - Ediens Team
+# [EDIT] - 2024-01-15 - Updated Docker Compose for development - Ediens Team
 version: '3.8'
 
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: ediens_postgres
+    container_name: ediens-postgres-1
     environment:
       POSTGRES_DB: ediens_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ediens_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ediens_password}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - ediens_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ediens_user -d ediens_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Redis for caching and sessions
   redis:
     image: redis:7-alpine
-    container_name: ediens_redis
+    container_name: ediens-redis-1
     ports:
       - "6379:6379"
     volumes:
@@ -30,58 +34,16 @@ services:
     networks:
       - ediens_network
     restart: unless-stopped
-
-  # Backend API
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: ediens_backend
-    environment:
-      NODE_ENV: development
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ediens_db
-      DB_USER: postgres
-      DB_PASSWORD: password
-      REDIS_URL: redis://redis:6379
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - ediens_network
-    restart: unless-stopped
-    command: npm run dev
-
-  # Frontend React App
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: ediens_frontend
-    environment:
-      VITE_API_URL: http://localhost:3001
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    networks:
-      - ediens_network
-    restart: unless-stopped
-    command: npm run dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # pgAdmin for database management (optional)
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: ediens_pgadmin
+    container_name: ediens-pgadmin-1
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@ediens.lv
       PGADMIN_DEFAULT_PASSWORD: admin123
@@ -90,7 +52,8 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - ediens_network
     restart: unless-stopped
