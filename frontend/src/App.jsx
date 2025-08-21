@@ -118,6 +118,7 @@ function App() {
                   iconTheme: {
                     primary: '#10B981',
                     secondary: '#fff',
+                  },
                 },
                 error: {
                   duration: 5000,
