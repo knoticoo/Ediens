@@ -1,5 +1,42 @@
 # Ediens Food Sharing App - Development Roadmap
 
+## 🚀 QUICK START SCRIPTS
+
+### 📦 Install Dependencies
+```bash
+# Make sure you have Node.js 18+ installed first!
+./install-dependencies.sh
+```
+
+### 🚀 Start Development Environment
+```bash
+# This will start everything: Docker, DB, Backend, Frontend
+./start-dev.sh
+```
+
+### 🔧 Manual Installation (if scripts don't work)
+```bash
+# Install Node.js 18+ first:
+# Option 1: Download from https://nodejs.org/
+# Option 2: Use nvm (recommended):
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 18
+nvm use 18
+
+# Then install dependencies:
+npm install
+cd backend && npm install
+cd ../frontend && npm install
+cd ..
+
+# Start services:
+docker-compose up -d
+cd backend && npm run dev &
+cd ../frontend && npm run dev &
+```
+
+---
+
 ## 🎯 Project Overview
 **Ediens** is a web-first food sharing application for Latvia that connects individuals for peer-to-peer leftover food sharing and allows businesses to post discounted "almost expired" deals.
 
@@ -34,10 +71,77 @@
 - **Deployment**: Production environment setup
 
 ### 🚨 IMPORTANT NOTES
+- **Node.js Version**: **REQUIRES Node.js 18+** - Current v12.22.9 is incompatible
 - **Map Integration**: Currently using mock map, needs Mapbox GL JS integration
 - **Image Upload**: Local storage implemented, needs cloud storage for production
 - **Socket.IO**: Real-time features implemented, needs production WebSocket setup
 - **Mobile**: Basic responsive design, needs mobile-first optimization
+
+### 🔧 NODE.JS VERSION FIX
+**Current Issue**: You're running Node.js v12.22.9, but the project requires v18+
+
+**Solutions**:
+1. **Use nvm (Recommended)**:
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+   source ~/.bashrc
+   nvm install 18
+   nvm use 18
+   ```
+
+2. **Download from Node.js website**:
+   - Visit https://nodejs.org/
+   - Download and install Node.js 18 LTS
+
+3. **Use Docker (Alternative)**:
+   ```bash
+   docker-compose up -d
+   # This bypasses local Node.js requirements
+   ```
+
+**After installing Node.js 18+**:
+```bash
+./install-dependencies.sh
+./start-dev.sh
+```
+
+---
+
+## 🚨 TROUBLESHOOTING
+
+### Common Issues & Solutions
+
+#### 1. Node.js Version Error
+**Error**: `npm WARN EBADENGINE Unsupported engine { node: '>=18.0.0' }`
+**Solution**: Install Node.js 18+ using nvm or download from nodejs.org
+
+#### 2. Permission Denied on Scripts
+**Error**: `Permission denied: ./install-dependencies.sh`
+**Solution**: 
+```bash
+chmod +x install-dependencies.sh start-dev.sh
+```
+
+#### 3. Docker Not Running
+**Error**: `Docker is not running or not accessible`
+**Solution**: Start Docker service or install Docker
+
+#### 4. Port Already in Use
+**Error**: `EADDRINUSE: address already in use :::3000`
+**Solution**: 
+```bash
+# Kill existing processes
+lsof -ti:3000 | xargs kill -9
+lsof -ti:5173 | xargs kill -9
+```
+
+#### 5. Database Connection Failed
+**Error**: `ECONNREFUSED: connect ECONNREFUSED 127.0.0.1:5432`
+**Solution**: 
+```bash
+docker-compose up -d
+# Wait for database to be ready
+```
 
 ### 📁 KEY FILES TO REVIEW
 - `frontend/src/store/NotificationContext.jsx` - Notification system core
