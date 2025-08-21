@@ -12,6 +12,7 @@
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "setup": "./install-dependencies.sh",
     "start:dev": "./start-dev.sh",
+    "status": "./check-status.sh",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:restart": "docker-compose restart",

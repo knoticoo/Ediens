@@ -39,6 +39,42 @@ if ! docker info > /dev/null 2>&1; then
 fi
 print_status "Docker is running"
 
+# Check if services are already running
+echo ""
+echo "🔍 Checking if services are already running..."
+SERVICES_RUNNING=false
+
+if docker ps --format "table {{.Names}}" | grep -q "ediens-postgres-1\|ediens-redis-1"; then
+    SERVICES_RUNNING=true
+fi
+
+if lsof -ti:3000 > /dev/null 2>&1 || lsof -ti:5173 > /dev/null 2>&1; then
+    SERVICES_RUNNING=true
+fi
+
+if [ "$SERVICES_RUNNING" = true ]; then
+    print_warning "Some services are already running"
+    echo ""
+    echo "Options:"
+    echo "   1. Restart all services (recommended)"
+    echo "   2. Exit and manage manually"
+    echo ""
+    read -p "Choose option (1 or 2): " choice
+    
+    case $choice in
+        1)
+            print_info "Restarting all services..."
+            ;;
+        2)
+            print_info "Exiting. You can manage services manually."
+            exit 0
+            ;;
+        *)
+            print_info "Invalid choice. Restarting all services..."
+            ;;
+    esac
+fi
+
 # Generate secure random passwords if they don't exist
 generate_secure_password() {
     openssl rand -base64 32 | tr -d "=+/" | cut -c1-25
@@ -214,7 +250,17 @@ fi
 
 cd ..
 
-# Check if ports are already in use
+# Stop any existing services and containers
+echo ""
+echo "🛑 Stopping any existing services..."
+print_info "Stopping existing Node.js processes..."
+pkill -f "npm run dev" 2>/dev/null || true
+pkill -f "node.*server" 2>/dev/null || true
+
+print_info "Stopping existing Docker containers..."
+docker-compose down 2>/dev/null || true
+
+# Check if ports are already in use and kill processes
 echo ""
 echo "🔍 Checking port availability..."
 if lsof -ti:3000 > /dev/null 2>&1; then
@@ -228,6 +274,9 @@ if lsof -ti:5173 > /dev/null 2>&1; then
     echo "   Stopping existing process..."
     lsof -ti:5173 | xargs kill -9 2>/dev/null
 fi
+
+# Wait a moment for processes to fully stop
+sleep 2
 
 # Start backend server
 echo ""
@@ -296,5 +345,51 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 # Wait for user to stop
+# Function to show service status
+show_status() {
+    echo ""
+    echo "📊 Service Status:"
+    echo "=================="
+    
+    # Check Docker services
+    if docker ps --format "table {{.Names}}\t{{.Status}}" | grep -q "ediens-postgres-1"; then
+        print_status "PostgreSQL: Running"
+    else
+        print_error "PostgreSQL: Not running"
+    fi
+    
+    if docker ps --format "table {{.Names}}\t{{.Status}}" | grep -q "ediens-redis-1"; then
+        print_status "Redis: Running"
+    else
+        print_error "Redis: Not running"
+    fi
+    
+    # Check Node.js processes
+    if lsof -ti:3000 > /dev/null 2>&1; then
+        print_status "Backend (Port 3000): Running"
+    else
+        print_error "Backend (Port 3000): Not running"
+    fi
+    
+    if lsof -ti:5173 > /dev/null 2>&1; then
+        print_status "Frontend (Port 5173): Running"
+    else
+        print_error "Frontend (Port 5173): Not running"
+    fi
+    
+    echo ""
+    echo "🌐 Access URLs:"
+    echo "   - Frontend: http://localhost:5173"
+    echo "   - Backend:  http://localhost:3000"
+    echo "   - pgAdmin:  http://localhost:5050 (admin@ediens.lv / admin123)"
+    echo ""
+}
+
+# Show initial status
+show_status
+
 echo "⏳ Press Ctrl+C to stop all services..."
+echo "   Or run 'docker-compose down' to stop only database services"
+
+# Wait for user to stop
 wait

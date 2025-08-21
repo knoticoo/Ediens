@@ -11,7 +11,23 @@
 ### 🚀 Start Development Environment
 ```bash
 # This will start everything: Docker, DB, Backend, Frontend
+# Automatically stops existing services and relaunches them
 ./start-dev.sh
+```
+
+### 📊 Check Service Status
+```bash
+# Check status of all services without starting them
+./check-status.sh
+```
+
+### 🔧 Using npm Scripts
+```bash
+npm run setup        # Install all dependencies
+npm run start:dev    # Start development environment
+npm run status       # Check service status
+npm run docker:up    # Start only database services
+npm run docker:down  # Stop database services
 ```
 
 ### 🔧 Manual Installation (if scripts don't work)
@@ -104,6 +120,31 @@ cd ../frontend && npm run dev &
 ./install-dependencies.sh
 ./start-dev.sh
 ```
+
+---
+
+## 🚀 AUTOMATIC SERVICE MANAGEMENT
+
+### Smart Startup Features
+- **Auto-stop existing services**: Automatically detects and stops running services
+- **Port conflict resolution**: Kills processes using required ports
+- **Secure password generation**: Creates random passwords for database and JWT
+- **Environment auto-configuration**: Generates .env file with secure defaults
+- **Database auto-setup**: Creates database, runs migrations, seeds data
+- **Health checks**: Waits for services to be fully ready before continuing
+- **Service status monitoring**: Shows real-time status of all services
+
+### Service Detection & Management
+- **Docker containers**: Automatically stops/restarts PostgreSQL, Redis, pgAdmin
+- **Node.js processes**: Detects and manages backend/frontend development servers
+- **Port management**: Automatically resolves port conflicts (3000, 5173, 5432, 6379)
+- **Database connections**: Waits for database to be ready before proceeding
+
+### Configuration Management
+- **Secure defaults**: Generates cryptographically secure passwords and secrets
+- **Environment variables**: Auto-creates .env file with all necessary configuration
+- **Docker integration**: Updates docker-compose.yml with generated passwords
+- **Skip existing config**: Reuses existing configuration if already set up
 
 ---
 
@@ -461,6 +502,10 @@ docker-compose up -d
 - `frontend/src/styles/globals.css` - Global styles
 - `docker-compose.yml` - Development environment
 - `README.md` - Comprehensive project documentation
+- `install-dependencies.sh` - Automated dependency installation script
+- `start-dev.sh` - Smart development environment startup script
+- `check-status.sh` - Service status monitoring script
+- `.env.example` - Environment configuration template
 
 ### 2024-01-15 - Ediens Team (Evening Update)
 **What was accomplished:**
