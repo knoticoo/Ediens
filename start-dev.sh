@@ -2,6 +2,16 @@
 
 # Ediens Food Sharing App - Development Environment Startup Script
 # This script automatically sets up and starts the complete development environment
+# 
+# Features:
+# - Auto-installs Docker if not present
+# - Auto-starts Docker daemon if not running
+# - Auto-installs Docker Compose if needed
+# - Creates docker-compose.yml if missing
+# - Sets up PostgreSQL, Redis, and pgAdmin
+# - Handles environment configuration
+# - Manages database setup and migrations
+# - Starts frontend and backend development servers
 
 echo "🍽️  Ediens Food Sharing App - Development Startup"
 echo "================================================"
@@ -32,12 +42,154 @@ print_info() {
 
 # Check if Docker is running
 echo "🐳 Checking Docker status..."
-if ! docker info > /dev/null 2>&1; then
-    print_error "Docker is not running or not accessible"
-    echo "   Please start Docker and try again"
-    exit 1
+
+# Function to install Docker
+install_docker() {
+    print_info "Docker not found. Installing Docker..."
+    
+    # Check if we have sudo privileges
+    if ! sudo -n true 2>/dev/null; then
+        print_error "Sudo privileges required to install Docker"
+        echo "   Please run this script with sudo or install Docker manually:"
+        echo "   curl -fsSL https://get.docker.com -o get-docker.sh"
+        echo "   sudo sh get-docker.sh"
+        echo "   sudo usermod -aG docker $USER"
+        echo "   Then log out and back in, or run: newgrp docker"
+        exit 1
+    fi
+    
+    # Update package list
+    sudo apt-get update -qq > /dev/null
+    
+    # Install required packages
+    sudo apt-get install -y -qq apt-transport-https ca-certificates curl gnupg lsb-release > /dev/null
+    
+    # Add Docker's official GPG key
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    
+    # Add Docker repository
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+    # Update package list again
+    sudo apt-get update -qq > /dev/null
+    
+    # Install Docker
+    sudo apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-compose-plugin > /dev/null
+    
+    # Add current user to docker group
+    sudo usermod -aG docker $USER
+    
+    print_status "Docker installed successfully"
+    print_warning "You may need to log out and back in for group changes to take effect"
+    print_warning "Or run: newgrp docker"
+}
+
+# Function to start Docker daemon
+start_docker_daemon() {
+    print_info "Starting Docker daemon..."
+    
+    # Try different methods to start Docker
+    local docker_started=false
+    
+    # Method 1: Try systemctl if available
+    if command -v systemctl &> /dev/null && systemctl is-system-running &> /dev/null; then
+        print_info "Trying systemctl to start Docker..."
+        if sudo systemctl start docker 2>/dev/null; then
+            sleep 3
+            if docker info > /dev/null 2>&1; then
+                docker_started=true
+                print_status "Docker started via systemctl"
+            fi
+        fi
+    fi
+    
+    # Method 2: Try direct daemon start
+    if [ "$docker_started" = false ]; then
+        print_info "Trying direct daemon start..."
+        sudo dockerd --host=unix:///var/run/docker.sock &
+        DOCKER_PID=$!
+        
+        # Wait for Docker to be ready
+        local attempts=0
+        local max_attempts=30
+        
+        while [ $attempts -lt $max_attempts ]; do
+            if docker info > /dev/null 2>&1; then
+                docker_started=true
+                print_status "Docker daemon started successfully"
+                break
+            fi
+            attempts=$((attempts + 1))
+            sleep 2
+        done
+        
+        if [ "$docker_started" = false ]; then
+            # Kill the background process if it failed
+            kill $DOCKER_PID 2>/dev/null || true
+        fi
+    fi
+    
+    # Method 3: Try using the get-docker script
+    if [ "$docker_started" = false ]; then
+        print_info "Trying alternative installation method..."
+        if curl -fsSL https://get.docker.com -o get-docker.sh 2>/dev/null; then
+            if sudo sh get-docker.sh --dry-run 2>/dev/null | grep -q "docker-ce"; then
+                print_info "Docker appears to be properly installed"
+                print_warning "Please start Docker manually:"
+                echo "   sudo dockerd &"
+                echo "   Or: sudo systemctl start docker"
+                return 1
+            fi
+        fi
+    fi
+    
+    if [ "$docker_started" = true ]; then
+        return 0
+    else
+        print_error "Failed to start Docker daemon"
+        return 1
+    fi
+}
+
+# Check for required system packages
+check_system_packages() {
+    local missing_packages=()
+    
+    # Check for essential packages
+    for package in curl wget apt-transport-https ca-certificates gnupg lsb-release; do
+        if ! dpkg -l | grep -q "^ii.*$package"; then
+            missing_packages+=("$package")
+        fi
+    done
+    
+    if [ ${#missing_packages[@]} -gt 0 ]; then
+        print_info "Installing required system packages..."
+        sudo apt-get update -qq > /dev/null
+        sudo apt-get install -y -qq "${missing_packages[@]}" > /dev/null
+        print_status "System packages installed"
+    fi
+}
+
+# Check if Docker is installed
+if ! command -v docker &> /dev/null; then
+    check_system_packages
+    install_docker
 fi
-print_status "Docker is running"
+
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    print_warning "Docker is not running. Attempting to start..."
+    
+    if start_docker_daemon; then
+        print_status "Docker is now running"
+    else
+        print_error "Failed to start Docker. Please start it manually and try again."
+        echo "   You can try: sudo dockerd &"
+        exit 1
+    fi
+else
+    print_status "Docker is running"
+fi
 
 # Check if services are already running
 echo ""
@@ -179,6 +331,80 @@ if [ -f .env ]; then
         sed -i "s/POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${DB_PASSWORD}/" docker-compose.yml
         print_status "Updated docker-compose.yml with database password"
     fi
+fi
+
+# Check if Docker Compose is available
+if ! command -v docker-compose &> /dev/null; then
+    print_warning "Docker Compose not found. Installing..."
+    sudo apt-get update -qq > /dev/null
+    sudo apt-get install -y -qq docker-compose-plugin > /dev/null
+    
+    # Create symlink for docker-compose command
+    if [ ! -f /usr/local/bin/docker-compose ]; then
+        sudo ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+    fi
+    
+    print_status "Docker Compose installed"
+fi
+
+# Check if docker-compose.yml exists
+if [ ! -f docker-compose.yml ]; then
+    print_warning "docker-compose.yml not found. Creating default configuration..."
+    
+    cat > docker-compose.yml << 'EOF'
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ediens-postgres-1
+    environment:
+      POSTGRES_DB: ediens_db
+      POSTGRES_USER: ediens_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ediens_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ediens_user -d ediens_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ediens-redis-1
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ediens-pgadmin-1
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ediens.lv
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:
+EOF
+
+    print_status "Created docker-compose.yml with default configuration"
 fi
 
 # Start Docker services
