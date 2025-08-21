@@ -1,4 +1,7 @@
 // [EDIT] - 2024-01-15 - Updated server.js with complete routes and middleware - Ediens Team
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -28,7 +31,7 @@ const usersRoutes = require('./routes/users');
 const staticRoutes = require('./routes/static');
 
 // Import database connection
-const sequelize = require('./database/connection');
+const { sequelize } = require('./database/connection');
 
 // Import models for synchronization
 const { User, FoodPost, Claim, Message } = require('./models');
@@ -287,16 +290,22 @@ app.use(notFound);
 async function startServer() {
   try {
     // Test database connection
-    await sequelize.authenticate();
-    console.log('✅ Database connection established successfully.');
+    try {
+      await sequelize.authenticate();
+      console.log('✅ Database connection established successfully.');
 
-    // Sync database models
-    if (NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      console.log('✅ Database models synchronized.');
-    } else {
-      await sequelize.sync();
-      console.log('✅ Database models synchronized (production mode).');
+      // Sync database models
+      if (NODE_ENV === 'development') {
+        await sequelize.sync({ alter: true });
+        console.log('✅ Database models synchronized.');
+      } else {
+        await sequelize.sync();
+        console.log('✅ Database models synchronized (production mode).');
+      }
+    } catch (dbError) {
+      console.warn('⚠️  Database connection failed:', dbError.message);
+      console.warn('⚠️  Server will start in degraded mode without database functionality');
+      console.warn('⚠️  API endpoints requiring database will return errors');
     }
 
     // Start server
@@ -322,8 +331,10 @@ process.on('SIGTERM', async () => {
   console.log('🛑 SIGTERM received, shutting down gracefully...');
   
   try {
-    await sequelize.close();
-    console.log('✅ Database connection closed.');
+    if (sequelize && sequelize.authenticate) {
+      await sequelize.close();
+      console.log('✅ Database connection closed.');
+    }
     
     server.close(() => {
       console.log('✅ HTTP server closed.');
@@ -339,8 +350,10 @@ process.on('SIGINT', async () => {
   console.log('🛑 SIGINT received, shutting down gracefully...');
   
   try {
-    await sequelize.close();
-    console.log('✅ Database connection closed.');
+    if (sequelize && sequelize.authenticate) {
+      await sequelize.close();
+      console.log('✅ Database connection closed.');
+    }
     
     server.close(() => {
       console.log('✅ HTTP server closed.');
