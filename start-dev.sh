@@ -229,7 +229,8 @@ fi
 
 # Generate secure random passwords if they don't exist
 generate_secure_password() {
-    openssl rand -base64 32 | tr -d "=+/" | cut -c1-25
+    # Generate a secure password with only alphanumeric characters
+    openssl rand -hex 32 | tr -d '\n' | cut -c1-25
 }
 
 # Check and create .env file with secure defaults
@@ -240,7 +241,7 @@ if [ ! -f .env ]; then
     
     # Generate secure passwords
     DB_PASSWORD=$(generate_secure_password)
-    JWT_SECRET=$(openssl rand -base64 64)
+    JWT_SECRET=$(openssl rand -hex 64)
     
     # Create .env file with secure defaults
     cat > .env << EOF
