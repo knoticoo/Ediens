@@ -8,6 +8,15 @@ export default {
   theme: {
     extend: {
       colors: {
+        border: {
+          DEFAULT: '#e5e7eb',
+        },
+        background: {
+          DEFAULT: '#ffffff',
+        },
+        foreground: {
+          DEFAULT: '#171717',
+        },
         primary: {
           50: '#f0fdf4',
           100: '#dcfce7',
