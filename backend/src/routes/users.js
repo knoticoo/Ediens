@@ -133,7 +133,7 @@ router.get('/nearby', authenticateToken, async (req, res) => {
           [require('sequelize').Op.dwithin]: {
             [require('sequelize').Op.fn]: 'ST_MakePoint',
             [require('sequelize').Op.col]: 'location',
-            rad * 1000 // Convert km to meters
+            [require('sequelize').Op.literal]: `${rad * 1000}` // Convert km to meters
           }
         }
       },

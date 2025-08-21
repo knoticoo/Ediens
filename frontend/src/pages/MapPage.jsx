@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from 'react-query';
 import { 
   MapPin, 
   Search, 

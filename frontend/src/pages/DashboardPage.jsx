@@ -25,7 +25,7 @@ import {
   XCircle,
   AlertTriangle
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from 'react-query';
 import { api } from '@api/auth';
 
 const DashboardPage = () => {

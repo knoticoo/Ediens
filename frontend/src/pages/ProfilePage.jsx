@@ -33,7 +33,7 @@ import {
   Lock,
   Trash2
 } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { api } from '@api/auth';
 import toast from 'react-hot-toast';
 

@@ -446,7 +446,7 @@ router.get('/nearby', optionalAuth, async (req, res) => {
           [Op.dwithin]: {
             [Op.fn]: 'ST_MakePoint',
             [Op.col]: 'location',
-            rad * 1000 // Convert km to meters
+            [Op.literal]: `${rad * 1000}` // Convert km to meters
           }
         }
       },
