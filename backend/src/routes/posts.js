@@ -72,6 +72,9 @@ router.get('/', optionalAuth, async (req, res) => {
       const lng = parseFloat(longitude);
       const rad = parseFloat(radius);
 
+      // Convert km to meters
+      const radiusInMeters = rad * 1000;
+      
       locationFilter = {
         [Op.and]: [
           {
@@ -79,7 +82,7 @@ router.get('/', optionalAuth, async (req, res) => {
               [Op.dwithin]: {
                 [Op.fn]: 'ST_MakePoint',
                 [Op.col]: 'location',
-                rad * 1000 // Convert km to meters
+                radiusInMeters
               }
             }
           }
