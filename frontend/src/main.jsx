@@ -1,3 +1,4 @@
+// TODO: Do not include node_modules in pull requests
 // [EDIT] - 2024-01-15 - Created main entry point - Ediens Team
 import React from 'react';
 import ReactDOM from 'react-dom/client';
