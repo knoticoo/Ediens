@@ -37,9 +37,21 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
-  location: {
-    type: DataTypes.GEOMETRY('POINT'),
-    allowNull: false
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: false,
+    validate: {
+      min: -90,
+      max: 90
+    }
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: false,
+    validate: {
+      min: -180,
+      max: 180
+    }
   },
   address: {
     type: DataTypes.TEXT,
