@@ -1,7 +1,7 @@
 // [EDIT] - 2024-01-15 - Created NotFoundPage component - Ediens Team
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Search, Map, Trending, ArrowLeft } from 'lucide-react';
+import { Home, Search, Map, TrendingUp, ArrowLeft } from 'lucide-react';
 
 const NotFoundPage = () => {
   return (
@@ -54,8 +54,8 @@ const NotFoundPage = () => {
               to="/trending"
               className="flex items-center justify-center gap-2 p-3 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
             >
-              <Trending size={16} />
-              Trending
+                              <TrendingUp size={16} />
+                Trending
             </Link>
             <Link
               to="/search"
