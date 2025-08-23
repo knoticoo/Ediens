@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 // Load environment variables from root directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'ediens_db',

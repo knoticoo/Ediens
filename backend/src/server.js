@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 // Load environment variables from root directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const express = require('express');
 const cors = require('cors');
