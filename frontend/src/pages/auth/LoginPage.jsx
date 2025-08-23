@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const { login, loginWithGoogle, loginWithFacebook } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -41,13 +43,13 @@ const LoginPage = () => {
     const newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = 'Электронная почта обязательна';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = 'Введите корректный email адрес';
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'Пароль обязателен';
     }
 
     setErrors(newErrors);

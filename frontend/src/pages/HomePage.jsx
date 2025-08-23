@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { 
   MapPin, 
   Heart, 
@@ -18,76 +19,77 @@ import {
 
 const HomePage = () => {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   const features = [
     {
       icon: MapPin,
-      title: 'Local Food Discovery',
-      description: 'Find fresh food near you with our interactive map and location-based search.',
+      title: t('home.localDiscovery'),
+      description: t('home.localDiscoveryDesc'),
       color: 'text-primary-500'
     },
     {
       icon: Heart,
-      title: 'Community Sharing',
-      description: 'Connect with neighbors to share leftover food and reduce waste together.',
+      title: t('home.communitySharing'),
+      description: t('home.communitySharingDesc'),
       color: 'text-secondary-500'
     },
     {
       icon: Leaf,
-      title: 'Eco-Friendly',
-      description: 'Earn eco points for every food item saved and contribute to sustainability.',
+      title: t('home.ecoFriendly'),
+      description: t('home.ecoFriendlyDesc'),
       color: 'text-success-500'
     },
     {
       icon: Shield,
-      title: 'Safe & Trusted',
-      description: 'Verified users and rating system ensure safe food sharing experiences.',
+      title: t('home.safeTrusted'),
+      description: t('home.safeTrustedDesc'),
       color: 'text-warning-500'
     },
     {
       icon: Clock,
-      title: 'Real-Time Updates',
-      description: 'Get instant notifications about new food posts and claim opportunities.',
+      title: t('home.realTimeUpdates'),
+      description: t('home.realTimeUpdatesDesc'),
       color: 'text-accent-500'
     },
     {
       icon: Users,
-      title: 'Business Integration',
-      description: 'Restaurants and shops can post surplus food at discounted prices.',
+      title: 'Интеграция бизнеса',
+      description: 'Рестораны и магазины могут размещать излишки еды по сниженным ценам.',
       color: 'text-blue-500'
     }
   ];
 
   const stats = [
-    { number: '10,000+', label: 'Food Items Shared' },
-    { number: '5,000+', label: 'Active Users' },
-    { number: '50+', label: 'Cities Covered' },
-    { number: '2,000+', label: 'Kg Food Saved' }
+    { number: '10,000+', label: t('home.postsShared') },
+    { number: '5,000+', label: t('home.usersJoined') },
+    { number: '50+', label: t('home.citiesCovered') },
+    { number: '2,000+', label: t('home.kgSaved') }
   ];
 
   const howItWorks = [
     {
       step: 1,
-      title: 'Post Food',
-      description: 'Share your leftover food with photos, descriptions, and pickup details.',
+      title: 'Размещение еды',
+      description: 'Поделитесь остатками еды с фотографиями, описанием и деталями получения.',
       icon: '🍽️'
     },
     {
       step: 2,
-      title: 'Discover & Claim',
-      description: 'Browse nearby food offers and claim items you want.',
+      title: t('home.step1Title'),
+      description: t('home.step1Desc'),
       icon: '🔍'
     },
     {
       step: 3,
-      title: 'Coordinate Pickup',
-      description: 'Message the food owner and arrange pickup time and location.',
+      title: t('home.step2Title'),
+      description: t('home.step2Desc'),
       icon: '💬'
     },
     {
       step: 4,
-      title: 'Enjoy & Rate',
-      description: 'Pick up your food and rate the experience to help others.',
+      title: 'Получение и оценка',
+      description: 'Заберите еду и оцените опыт, чтобы помочь другим.',
       icon: '⭐'
     }
   ];
@@ -99,11 +101,11 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Share Food,
-              <span className="text-gradient block">Save the Planet</span>
+              {t('home.heroTitle')}
+              <span className="text-gradient block">{t('home.heroSubtitle')}</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Connect with your community to share leftover food, reduce waste, and build a more sustainable future in Latvia.
+              {t('home.heroDescription')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -113,13 +115,13 @@ const HomePage = () => {
                     to="/register"
                     className="btn-primary btn-lg text-lg px-8 py-4"
                   >
-                    Get Started Free
+                    {t('home.getStarted')}
                   </Link>
                   <Link
                     to="/how-it-works"
                     className="btn-outline btn-lg text-lg px-8 py-4"
                   >
-                    Learn How It Works
+                    {t('home.learnMore')}
                   </Link>
                 </>
               ) : (
@@ -128,13 +130,13 @@ const HomePage = () => {
                     to="/create-post"
                     className="btn-primary btn-lg text-lg px-8 py-4"
                   >
-                    Share Food Now
+                    {t('home.startSharing')}
                   </Link>
                   <Link
                     to="/map"
                     className="btn-outline btn-lg text-lg px-8 py-4"
                   >
-                    Browse Food
+                    {t('errors.browseFood')}
                   </Link>
                 </>
               )}

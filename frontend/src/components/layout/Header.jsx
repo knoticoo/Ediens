@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { 
   Search, 
   MapPin, 
@@ -18,6 +19,7 @@ import NotificationDropdown from './NotificationDropdown';
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,10 +45,10 @@ const Header = () => {
   const isActive = (path) => location.pathname === path;
 
   const navItems = [
-    { path: '/', label: 'Home', icon: null },
-    { path: '/map', label: 'Map', icon: MapPin },
-    { path: '/trending', label: 'Trending', icon: Heart },
-    { path: '/leaderboard', label: 'Leaderboard', icon: null },
+    { path: '/', label: t('nav.home'), icon: null },
+    { path: '/map', label: t('nav.map'), icon: MapPin },
+    { path: '/trending', label: t('nav.trending'), icon: Heart },
+    { path: '/leaderboard', label: t('nav.leaderboard'), icon: null },
   ];
 
   return (

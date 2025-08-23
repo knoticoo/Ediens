@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js",
     "test": "jest",
     "lint": "eslint src/",
+    "db:init": "node src/database/init.js",
     "db:migrate": "node src/database/migrate.js",
     "db:reset": "node src/database/reset-db.js",
     "db:seed": "node src/database/seed.js"
@@ -31,11 +32,11 @@
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
-    "pg": "^8.11.3",
     "sequelize": "^6.35.0",
     "sequelize-cli": "^6.6.2",
     "sharp": "^0.33.5",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.7.4",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "eslint": "^8.55.0",
