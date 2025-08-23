@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const { User } = require('../models');
 const { validateRegistration, validateLogin } = require('../middleware/validation');
 const { authenticateToken } = require('../middleware/auth');
+const { authRateLimit, checkAccountLockout, recordFailedAttempt } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const generateToken = (user) => {
 };
 
 // User registration
-router.post('/register', validateRegistration, async (req, res) => {
+router.post('/register', authRateLimit, validateRegistration, async (req, res) => {
   try {
     const { email, password, firstName, lastName, phone, city, address, isBusiness, businessName, businessType } = req.body;
 
@@ -33,7 +34,7 @@ router.post('/register', validateRegistration, async (req, res) => {
       return res.status(400).json({ error: 'User with this email already exists' });
     }
 
-    // Create user
+    // Create user with default coordinates (will be updated when user sets location)
     const user = await User.create({
       email,
       password,
@@ -45,10 +46,8 @@ router.post('/register', validateRegistration, async (req, res) => {
       isBusiness: isBusiness || false,
       businessName: isBusiness ? businessName : null,
       businessType: isBusiness ? businessType : null,
-      location: {
-        type: 'Point',
-        coordinates: [0, 0] // Will be updated when user sets location
-      }
+      latitude: 0, // Default latitude - will be updated when user sets location
+      longitude: 0 // Default longitude - will be updated when user sets location
     });
 
     // Generate token
@@ -70,7 +69,7 @@ router.post('/register', validateRegistration, async (req, res) => {
 });
 
 // User login
-router.post('/login', validateLogin, async (req, res) => {
+router.post('/login', authRateLimit, checkAccountLockout, validateLogin, recordFailedAttempt, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -83,6 +82,8 @@ router.post('/login', validateLogin, async (req, res) => {
     // Check password
     const isValidPassword = await user.comparePassword(password);
     if (!isValidPassword) {
+      // Record failed attempt
+      req.failedAttempt = true;
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -213,12 +214,10 @@ router.put('/location', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Update location
+    // Update location coordinates
     await user.update({
-      location: {
-        type: 'Point',
-        coordinates: [parseFloat(longitude), parseFloat(latitude)]
-      },
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
       address: address || user.address,
       city: city || user.city
     });

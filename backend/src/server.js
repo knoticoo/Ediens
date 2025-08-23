@@ -1,6 +1,9 @@
 // [EDIT] - 2024-01-15 - Updated server.js with complete routes and middleware - Ediens Team
 const dotenv = require('dotenv');
-dotenv.config();
+const path = require('path');
+
+// Load environment variables from root directory
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const express = require('express');
 const cors = require('cors');
