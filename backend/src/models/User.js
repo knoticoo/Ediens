@@ -123,6 +123,21 @@ const User = sequelize.define('User', {
       },
       radius: 10, // km
       categories: ['fresh', 'cooked', 'bakery', 'packaged']
+    },
+    get() {
+      const value = this.getDataValue('preferences');
+      if (!value) {
+        return {
+          notifications: {
+            email: true,
+            push: true,
+            sms: false
+          },
+          radius: 10,
+          categories: ['fresh', 'cooked', 'bakery', 'packaged']
+        };
+      }
+      return value;
     }
   }
 }, {
