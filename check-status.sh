@@ -30,7 +30,23 @@ print_info() {
     echo -e "${BLUE}ℹ️${NC} $1"
 }
 
+# Detect environment (VPS vs local)
+detect_environment() {
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        # We're on a remote server, get the external IP
+        EXTERNAL_IP=$(curl -s ifconfig.me 2>/dev/null || curl -s ipinfo.io/ip 2>/dev/null || echo "localhost")
+        print_info "VPS Environment detected - External IP: $EXTERNAL_IP"
+    else
+        EXTERNAL_IP="localhost"
+        print_info "Local Environment detected"
+    fi
+}
+
+# Detect environment
+detect_environment
+
 # Check Docker status
+echo ""
 echo "🐳 Docker Status:"
 if docker info > /dev/null 2>&1; then
     print_status "Docker is running"
@@ -107,23 +123,54 @@ else
     print_error "Port 6379: Available"
 fi
 
-# Check .env file
+if lsof -i:5050 > /dev/null 2>&1; then
+    print_status "Port 5050: In use (pgAdmin)"
+else
+    print_error "Port 5050: Available"
+fi
+
+# Show access URLs
 echo ""
-echo "🔐 Environment Configuration:"
-if [ -f .env ]; then
-    print_status ".env file exists"
-    if grep -q "DB_PASSWORD=" .env; then
-        DB_PASSWORD=$(grep "DB_PASSWORD=" .env | cut -d'=' -f2)
-        if [ "$DB_PASSWORD" != "your-database-password" ] && [ -n "$DB_PASSWORD" ]; then
-            print_status "Database password: Configured"
-        else
-            print_warning "Database password: Not configured"
-        fi
+echo "🌐 Access URLs:"
+if lsof -i:5173 > /dev/null 2>&1; then
+    print_status "Frontend: http://${EXTERNAL_IP}:5173"
+else
+    print_error "Frontend: Not accessible"
+fi
+
+if lsof -i:3000 > /dev/null 2>&1; then
+    print_status "Backend:  http://${EXTERNAL_IP}:3000"
+else
+    print_error "Backend:  Not accessible"
+fi
+
+if lsof -i:5050 > /dev/null 2>&1; then
+    print_status "pgAdmin:  http://${EXTERNAL_IP}:5050 (admin@ediens.lv / admin123)"
+else
+    print_error "pgAdmin:  Not accessible"
+fi
+
+# Check database connection
+echo ""
+echo "🗄️  Database Connection Test:"
+if docker ps --format "table {{.Names}}" | grep -q "ediens-postgres-1"; then
+    if docker exec ediens-postgres-1 pg_isready -U ediens_user -d ediens_db > /dev/null 2>&1; then
+        print_status "PostgreSQL: Connection successful"
     else
-        print_error "Database password: Missing"
+        print_warning "PostgreSQL: Container running but connection failed"
     fi
 else
-    print_error ".env file missing"
+    print_error "PostgreSQL: Container not running"
+fi
+
+if docker ps --format "table {{.Names}}" | grep -q "ediens-redis-1"; then
+    if docker exec ediens-redis-1 redis-cli ping > /dev/null 2>&1; then
+        print_status "Redis: Connection successful"
+    else
+        print_warning "Redis: Container running but connection failed"
+    fi
+else
+    print_error "Redis: Container not running"
 fi
 
 # Summary
@@ -131,6 +178,7 @@ echo ""
 echo "📊 Summary:"
 echo "==========="
 
+# Count running services
 RUNNING_SERVICES=0
 TOTAL_SERVICES=5
 
@@ -138,19 +186,16 @@ if docker ps --format "table {{.Names}}" | grep -q "ediens-postgres-1"; then RUN
 if docker ps --format "table {{.Names}}" | grep -q "ediens-redis-1"; then RUNNING_SERVICES=$((RUNNING_SERVICES + 1)); fi
 if lsof -ti:3000 > /dev/null 2>&1; then RUNNING_SERVICES=$((RUNNING_SERVICES + 1)); fi
 if lsof -ti:5173 > /dev/null 2>&1; then RUNNING_SERVICES=$((RUNNING_SERVICES + 1)); fi
-if [ -f .env ]; then RUNNING_SERVICES=$((RUNNING_SERVICES + 1)); fi
+if docker ps --format "table {{.Names}}" | grep -q "ediens-pgadmin-1"; then RUNNING_SERVICES=$((RUNNING_SERVICES + 1)); fi
 
 if [ $RUNNING_SERVICES -eq $TOTAL_SERVICES ]; then
     print_status "All services are running! ($RUNNING_SERVICES/$TOTAL_SERVICES)"
 elif [ $RUNNING_SERVICES -gt 0 ]; then
     print_warning "Some services are running ($RUNNING_SERVICES/$TOTAL_SERVICES)"
 else
-    print_error "No services are running ($RUNNING_SERVICES/$TOTAL_SERVICES)"
+    print_error "No services are running (0/$TOTAL_SERVICES)"
 fi
 
 echo ""
-echo "🚀 Quick Actions:"
-echo "   - Start all services: ./start-dev.sh"
-echo "   - Stop database services: docker-compose down"
-echo "   - Install dependencies: ./install-dependencies.sh"
-echo "   - Check this status again: ./check-status.sh"
+echo "💡 To start all services, run: ./start-dev.sh"
+echo "🛑 To stop database services, run: docker compose down"
