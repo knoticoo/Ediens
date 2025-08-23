@@ -1,10 +1,14 @@
 // [EDIT] - 2024-01-15 - Created Vite configuration - Ediens Team
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => {
+  // Load env file from root directory
+  const env = loadEnv(mode, resolve(__dirname, '..'), ['VITE_', 'NODE_ENV']);
+  
+  return {
+    plugins: [react()],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -42,7 +46,9 @@ export default defineConfig({
       }
     }
   },
-  define: {
-    'process.env': {}
-  }
+    define: {
+      'process.env': env
+    },
+    envDir: resolve(__dirname, '..')
+  };
 });

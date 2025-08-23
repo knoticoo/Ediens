@@ -1,70 +1,9 @@
-# [EDIT] - 2024-01-15 - Updated Docker Compose for development - Ediens Team
+# [EDIT] - 2024-01-15 - Simplified Docker Compose for SQLite - Ediens Team
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: ediens-postgres-1
-    environment:
-      POSTGRES_DB: ediens_db
-      POSTGRES_USER: ediens_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-ediens_password}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - ediens_network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ediens_user -d ediens_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Redis for caching and sessions
-  redis:
-    image: redis:7-alpine
-    container_name: ediens-redis-1
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - ediens_network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # pgAdmin for database management (optional)
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: ediens-pgadmin-1
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@ediens.lv
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - ediens_network
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  pgadmin_data:
-    driver: local
+  # No database services needed - using SQLite
+  # Add any future services here (e.g., Redis for production caching)
 
 networks:
   ediens_network:

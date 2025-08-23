@@ -114,7 +114,7 @@ const User = sequelize.define('User', {
     defaultValue: DataTypes.NOW
   },
   preferences: {
-    type: DataTypes.JSONB,
+    type: DataTypes.JSON,
     defaultValue: {
       notifications: {
         email: true,

@@ -68,11 +68,14 @@ const FoodPost = sequelize.define('FoodPost', {
     }
   },
   images: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+    type: DataTypes.JSON,
     defaultValue: [],
     get() {
       const value = this.getDataValue('images');
-      return value || [];
+      return Array.isArray(value) ? value : [];
+    },
+    set(value) {
+      this.setDataValue('images', Array.isArray(value) ? value : []);
     }
   },
   latitude: {
@@ -116,27 +119,46 @@ const FoodPost = sequelize.define('FoodPost', {
     defaultValue: 'medium'
   },
   allergens: {
-    type: DataTypes.ARRAY(DataTypes.ENUM('Gluten', 'Dairy', 'Eggs', 'Soy', 'Nuts', 'Peanuts', 'Fish', 'Shellfish')),
+    type: DataTypes.JSON,
     defaultValue: [],
     get() {
       const value = this.getDataValue('allergens');
-      return value || [];
+      return Array.isArray(value) ? value : [];
+    },
+    set(value) {
+      this.setDataValue('allergens', Array.isArray(value) ? value : []);
+    },
+    validate: {
+      isValidAllergens: function(value) {
+        const validAllergens = ['Gluten', 'Dairy', 'Eggs', 'Soy', 'Nuts', 'Peanuts', 'Fish', 'Shellfish'];
+        if (value && Array.isArray(value)) {
+          for (const allergen of value) {
+            if (!validAllergens.includes(allergen)) {
+              throw new Error(`Invalid allergen: ${allergen}`);
+            }
+          }
+        }
+      }
     }
   },
   dietaryInfo: {
-    type: DataTypes.ARRAY(DataTypes.ENUM('vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher')),
+    type: DataTypes.JSON,
     defaultValue: [],
     get() {
       const value = this.getDataValue('dietaryInfo');
-      return value || [];
+      return Array.isArray(value) ? value : [];
+    },
+    set(value) {
+      this.setDataValue('dietaryInfo', Array.isArray(value) ? value : []);
     },
     validate: {
       isValidDietaryInfo: function(value) {
+        const validDietaryInfo = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher'];
         if (value && Array.isArray(value)) {
-          const validValues = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher'];
-          const invalidValues = value.filter(item => !validValues.includes(item));
-          if (invalidValues.length > 0) {
-            throw new Error(`Invalid dietary info values: ${invalidValues.join(', ')}`);
+          for (const diet of value) {
+            if (!validDietaryInfo.includes(diet)) {
+              throw new Error(`Invalid dietary info: ${diet}`);
+            }
           }
         }
       }
@@ -163,15 +185,18 @@ const FoodPost = sequelize.define('FoodPost', {
     defaultValue: false
   },
   businessHours: {
-    type: DataTypes.JSONB,
+    type: DataTypes.JSON,
     allowNull: true
   },
   tags: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+    type: DataTypes.JSON,
     defaultValue: [],
     get() {
       const value = this.getDataValue('tags');
-      return value || [];
+      return Array.isArray(value) ? value : [];
+    },
+    set(value) {
+      this.setDataValue('tags', Array.isArray(value) ? value : []);
     }
   },
   viewCount: {
