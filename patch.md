@@ -1,5 +1,7 @@
 # Patch Notes - Ediens Food Sharing Platform
 
+## ⚠️ **IMPORTANT: DO NOT PULL REQUEST node_modules FOLDER**
+
 ## 2024-01-15 - Database Connection and CSS Issues Fix
 
 ### Issues Identified:
