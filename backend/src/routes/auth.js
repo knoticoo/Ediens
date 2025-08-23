@@ -33,7 +33,7 @@ router.post('/register', validateRegistration, async (req, res) => {
       return res.status(400).json({ error: 'User with this email already exists' });
     }
 
-    // Create user
+    // Create user with default coordinates (will be updated when user sets location)
     const user = await User.create({
       email,
       password,
@@ -45,10 +45,8 @@ router.post('/register', validateRegistration, async (req, res) => {
       isBusiness: isBusiness || false,
       businessName: isBusiness ? businessName : null,
       businessType: isBusiness ? businessType : null,
-      location: {
-        type: 'Point',
-        coordinates: [0, 0] // Will be updated when user sets location
-      }
+      latitude: 0, // Default latitude - will be updated when user sets location
+      longitude: 0 // Default longitude - will be updated when user sets location
     });
 
     // Generate token
@@ -213,12 +211,10 @@ router.put('/location', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Update location
+    // Update location coordinates
     await user.update({
-      location: {
-        type: 'Point',
-        coordinates: [parseFloat(longitude), parseFloat(latitude)]
-      },
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
       address: address || user.address,
       city: city || user.city
     });
