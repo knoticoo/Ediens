@@ -35,7 +35,8 @@ export const ruTranslations = {
     profile: 'Профиль',
     logout: 'Выйти',
     login: 'Войти',
-    register: 'Регистрация'
+    register: 'Регистрация',
+    enabled: 'Включено'
   },
 
   // Navigation
@@ -80,10 +81,16 @@ export const ruTranslations = {
     businessName: 'Название бизнеса',
     businessType: 'Тип бизнеса',
     businessDescription: 'Описание бизнеса',
+    businessAccount: 'Бизнес-аккаунт',
+    businessOptional: 'Опционально - для ресторанов, пекарен и магазинов',
     terms: 'Я согласен с',
     termsOfService: 'Условиями обслуживания',
     privacyPolicy: 'Политикой конфиденциальности',
-    and: 'и'
+    and: 'и',
+    loginTitle: 'Войти в Ediens',
+    loginSubtitle: 'Добро пожаловать обратно! Войдите, чтобы продолжить делиться едой.',
+    registerTitle: 'Присоединиться к революции обмена едой',
+    registerSubtitle: 'Создайте аккаунт и начните делиться едой с вашим сообществом'
   },
 
   // Homepage
@@ -388,7 +395,10 @@ export const ruTranslations = {
     notFound: 'Не найдено',
     validationError: 'Ошибка валидации',
     sessionExpired: 'Сессия истекла',
-    pleaseLoginAgain: 'Пожалуйста, войдите снова'
+    pleaseLoginAgain: 'Пожалуйста, войдите снова',
+    emailRequired: 'Электронная почта обязательна',
+    emailInvalid: 'Введите корректный email адрес',
+    passwordRequired: 'Пароль обязателен'
   },
 
   // Success messages

@@ -43,13 +43,13 @@ const LoginPage = () => {
     const newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Электронная почта обязательна';
+      newErrors.email = t('errors.emailRequired', 'Email is required');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Введите корректный email адрес';
+      newErrors.email = t('errors.emailInvalid', 'Please enter a valid email address');
     }
 
     if (!formData.password) {
-      newErrors.password = 'Пароль обязателен';
+      newErrors.password = t('errors.passwordRequired', 'Password is required');
     }
 
     setErrors(newErrors);
@@ -115,10 +115,10 @@ const LoginPage = () => {
           </Link>
           
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back
+            {t('auth.loginTitle', 'Welcome back')}
           </h2>
           <p className="text-gray-600">
-            Sign in to your account to continue sharing food
+            {t('auth.loginSubtitle', 'Sign in to your account to continue sharing food')}
           </p>
         </div>
 
@@ -128,7 +128,7 @@ const LoginPage = () => {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
+                {t('auth.email', 'Email address')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -143,7 +143,7 @@ const LoginPage = () => {
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Enter your email"
+                  placeholder={t('auth.email', 'Enter your email')}
                 />
                 {errors.email && (
                   <div className="flex items-center mt-2 text-sm text-red-600">
@@ -157,7 +157,7 @@ const LoginPage = () => {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                {t('auth.password', 'Password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />

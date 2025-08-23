@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { 
   Eye, 
   EyeOff, 
@@ -20,6 +21,7 @@ import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
   const { register } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -195,10 +197,10 @@ const RegisterPage = () => {
           </Link>
           
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Join the food sharing revolution
+            {t('auth.registerTitle', 'Join the food sharing revolution')}
           </h2>
           <p className="text-gray-600">
-            Create your account and start sharing food with your community
+            {t('auth.registerSubtitle', 'Create your account and start sharing food with your community')}
           </p>
         </div>
 
@@ -209,7 +211,7 @@ const RegisterPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name *
+                  {t('auth.firstName', 'First Name')} *
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -224,7 +226,7 @@ const RegisterPage = () => {
                     className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                       errors.firstName ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Enter your first name"
+                    placeholder={t('auth.firstName', 'Enter your first name')}
                   />
                 </div>
                 {errors.firstName && (
@@ -237,7 +239,7 @@ const RegisterPage = () => {
 
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name *
+                  {t('auth.lastName', 'Last Name')} *
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -252,7 +254,7 @@ const RegisterPage = () => {
                     className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                       errors.lastName ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Enter your last name"
+                    placeholder={t('auth.lastName', 'Enter your last name')}
                   />
                 </div>
                 {errors.lastName && (
@@ -267,7 +269,7 @@ const RegisterPage = () => {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address *
+                {t('auth.email', 'Email Address')} *
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -282,7 +284,7 @@ const RegisterPage = () => {
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Enter your email address"
+                  placeholder={t('auth.email', 'Enter your email address')}
                 />
               </div>
               {errors.email && (
@@ -297,7 +299,7 @@ const RegisterPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
+                  {t('auth.password', 'Password')} *
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -312,7 +314,7 @@ const RegisterPage = () => {
                     className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                       errors.password ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Create a password"
+                    placeholder={t('auth.password', 'Create a password')}
                   />
                   <button
                     type="button"
@@ -332,7 +334,7 @@ const RegisterPage = () => {
 
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password *
+                  {t('auth.confirmPassword', 'Confirm Password')} *
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -347,7 +349,7 @@ const RegisterPage = () => {
                     className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                       errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Confirm your password"
+                    placeholder={t('auth.confirmPassword', 'Confirm your password')}
                   />
                   <button
                     type="button"
@@ -370,7 +372,7 @@ const RegisterPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                  {t('auth.phone', 'Phone Number')}
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -389,7 +391,7 @@ const RegisterPage = () => {
 
               <div>
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
-                  City *
+                  {t('auth.city', 'City')} *
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -403,7 +405,7 @@ const RegisterPage = () => {
                       errors.city ? 'border-red-300' : 'border-gray-300'
                     }`}
                   >
-                    <option value="">Select your city</option>
+                    <option value="">{t('auth.city', 'Select your city')}</option>
                     {latvianCities.map(city => (
                       <option key={city} value={city}>{city}</option>
                     ))}
@@ -421,7 +423,7 @@ const RegisterPage = () => {
             {/* Address */}
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                Address
+                {t('auth.address', 'Address')}
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -448,9 +450,9 @@ const RegisterPage = () => {
                 <div className="flex items-center space-x-3">
                   <Building className="w-5 h-5 text-primary-600" />
                   <div className="text-left">
-                    <div className="font-medium text-gray-900">Business Account</div>
+                    <div className="font-medium text-gray-900">{t('auth.businessAccount', 'Business Account')}</div>
                     <div className="text-sm text-gray-600">
-                      {formData.isBusiness ? 'Enabled' : 'Optional - for restaurants, bakeries, and shops'}
+                      {formData.isBusiness ? t('common.enabled', 'Enabled') : t('auth.businessOptional', 'Optional - for restaurants, bakeries, and shops')}
                     </div>
                   </div>
                 </div>
@@ -468,7 +470,7 @@ const RegisterPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
-                      Business Name *
+                      {t('auth.businessName', 'Business Name')} *
                     </label>
                     <input
                       id="businessName"
@@ -479,7 +481,7 @@ const RegisterPage = () => {
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
                         errors.businessName ? 'border-red-300' : 'border-gray-300'
                       }`}
-                      placeholder="Enter business name"
+                      placeholder={t('auth.businessName', 'Enter business name')}
                     />
                     {errors.businessName && (
                       <div className="flex items-center mt-2 text-sm text-red-600">
@@ -491,7 +493,7 @@ const RegisterPage = () => {
 
                   <div>
                     <label htmlFor="businessType" className="block text-sm font-medium text-gray-700 mb-2">
-                      Business Type *
+                      {t('auth.businessType', 'Business Type')} *
                     </label>
                     <select
                       id="businessType"
@@ -502,7 +504,7 @@ const RegisterPage = () => {
                         errors.businessType ? 'border-red-300' : 'border-gray-300'
                       }`}
                     >
-                      <option value="">Select business type</option>
+                      <option value="">{t('auth.businessType', 'Select business type')}</option>
                       {businessTypes.map(type => (
                         <option key={type.value} value={type.value}>{type.label}</option>
                       ))}
@@ -543,13 +545,13 @@ const RegisterPage = () => {
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-1"
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                I agree to the{' '}
+                {t('auth.terms', 'I agree to the')}{' '}
                 <Link to="/terms" className="text-primary-600 hover:text-primary-500 underline">
-                  Terms of Service
+                  {t('auth.termsOfService', 'Terms of Service')}
                 </Link>{' '}
-                and{' '}
+                {t('auth.and', 'and')}{' '}
                 <Link to="/privacy" className="text-primary-600 hover:text-primary-500 underline">
-                  Privacy Policy
+                  {t('auth.privacyPolicy', 'Privacy Policy')}
                 </Link>
               </label>
             </div>
@@ -563,10 +565,10 @@ const RegisterPage = () => {
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Creating account...
+                  {t('common.loading', 'Creating account...')}
                 </div>
               ) : (
-                'Create Account'
+                t('auth.register', 'Create Account')
               )}
             </button>
           </form>
@@ -574,12 +576,12 @@ const RegisterPage = () => {
           {/* Sign In Link */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Already have an account?{' '}
+              {t('auth.alreadyHaveAccount', 'Already have an account?')}{' '}
               <Link
                 to="/login"
                 className="font-semibold text-primary-600 hover:text-primary-500 transition-colors"
               >
-                Sign in here
+                {t('auth.signInHere', 'Sign in here')}
               </Link>
             </p>
           </div>
