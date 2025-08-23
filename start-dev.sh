@@ -87,6 +87,24 @@ install_dependencies_if_needed() {
             exit 1
         fi
     fi
+    
+    # Ensure sqlite3 is installed for backend
+    echo ""
+    print_info "Ensuring sqlite3 is installed for backend..."
+    cd backend
+    if npm list sqlite3 > /dev/null 2>&1; then
+        print_status "sqlite3 already installed"
+    else
+        print_warning "sqlite3 not found, installing..."
+        npm install sqlite3
+        if [ $? -eq 0 ]; then
+            print_status "sqlite3 installed successfully"
+        else
+            print_error "Failed to install sqlite3"
+            exit 1
+        fi
+    fi
+    cd ..
 }
 
 # Check Docker status and handle gracefully
@@ -180,7 +198,16 @@ start_backend() {
     if [ "$DOCKER_AVAILABLE" = false ]; then
         export DATABASE_URL=""
         export REDIS_URL=""
-        print_warning "Backend starting in database-less mode"
+        print_warning "Backend starting with SQLite database"
+        
+        # Initialize SQLite database if needed
+        echo "🔄 Initializing SQLite database..."
+        npm run db:init
+        if [ $? -eq 0 ]; then
+            print_status "SQLite database initialized successfully"
+        else
+            print_warning "Database initialization failed, continuing anyway..."
+        fi
     fi
     
     npm run dev &
@@ -319,8 +346,8 @@ main() {
     echo "🎉 Development environment started successfully!"
     echo ""
     if [ "$DOCKER_AVAILABLE" = false ]; then
-        print_warning "Running in database-less mode - some features may not work"
-        print_warning "To enable full functionality, ensure Docker is running with proper permissions"
+        print_warning "Running with SQLite database - some advanced features may not work"
+        print_warning "To enable full functionality with PostgreSQL, ensure Docker is running with proper permissions"
     fi
     echo ""
     echo "🛑 To stop all services:"
