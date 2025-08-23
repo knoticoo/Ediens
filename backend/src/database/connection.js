@@ -1,8 +1,10 @@
 // [EDIT] - 2024-01-15 - Created database connection - Ediens Team
 const { Sequelize } = require('sequelize');
 const dotenv = require('dotenv');
+const path = require('path');
 
-dotenv.config();
+// Load environment variables from root directory
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'ediens_db',

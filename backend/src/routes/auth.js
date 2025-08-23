@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const { User } = require('../models');
 const { validateRegistration, validateLogin } = require('../middleware/validation');
 const { authenticateToken } = require('../middleware/auth');
+const { authRateLimit, checkAccountLockout, recordFailedAttempt } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const generateToken = (user) => {
 };
 
 // User registration
-router.post('/register', validateRegistration, async (req, res) => {
+router.post('/register', authRateLimit, validateRegistration, async (req, res) => {
   try {
     const { email, password, firstName, lastName, phone, city, address, isBusiness, businessName, businessType } = req.body;
 
@@ -68,7 +69,7 @@ router.post('/register', validateRegistration, async (req, res) => {
 });
 
 // User login
-router.post('/login', validateLogin, async (req, res) => {
+router.post('/login', authRateLimit, checkAccountLockout, validateLogin, recordFailedAttempt, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -81,6 +82,8 @@ router.post('/login', validateLogin, async (req, res) => {
     // Check password
     const isValidPassword = await user.comparePassword(password);
     if (!isValidPassword) {
+      // Record failed attempt
+      req.failedAttempt = true;
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
