@@ -69,7 +69,11 @@ const FoodPost = sequelize.define('FoodPost', {
   },
   images: {
     type: DataTypes.ARRAY(DataTypes.STRING),
-    defaultValue: []
+    defaultValue: [],
+    get() {
+      const value = this.getDataValue('images');
+      return value || [];
+    }
   },
   latitude: {
     type: DataTypes.DECIMAL(10, 8),
@@ -112,12 +116,20 @@ const FoodPost = sequelize.define('FoodPost', {
     defaultValue: 'medium'
   },
   allergens: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    defaultValue: []
+    type: DataTypes.ARRAY(DataTypes.ENUM('Gluten', 'Dairy', 'Eggs', 'Soy', 'Nuts', 'Peanuts', 'Fish', 'Shellfish')),
+    defaultValue: [],
+    get() {
+      const value = this.getDataValue('allergens');
+      return value || [];
+    }
   },
   dietaryInfo: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+    type: DataTypes.ARRAY(DataTypes.ENUM('vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher')),
     defaultValue: [],
+    get() {
+      const value = this.getDataValue('dietaryInfo');
+      return value || [];
+    },
     validate: {
       isValidDietaryInfo: function(value) {
         if (value && Array.isArray(value)) {
@@ -156,7 +168,11 @@ const FoodPost = sequelize.define('FoodPost', {
   },
   tags: {
     type: DataTypes.ARRAY(DataTypes.STRING),
-    defaultValue: []
+    defaultValue: [],
+    get() {
+      const value = this.getDataValue('tags');
+      return value || [];
+    }
   },
   viewCount: {
     type: DataTypes.INTEGER,
