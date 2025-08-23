@@ -9,6 +9,7 @@
     "test": "jest",
     "lint": "eslint src/",
     "db:migrate": "node src/database/migrate.js",
+    "db:reset": "node src/database/reset-db.js",
     "db:seed": "node src/database/seed.js"
   },
   "dependencies": {
