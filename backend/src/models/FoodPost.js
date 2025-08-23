@@ -116,8 +116,19 @@ const FoodPost = sequelize.define('FoodPost', {
     defaultValue: []
   },
   dietaryInfo: {
-    type: DataTypes.ARRAY(DataTypes.ENUM('vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher')),
-    defaultValue: []
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: [],
+    validate: {
+      isValidDietaryInfo: function(value) {
+        if (value && Array.isArray(value)) {
+          const validValues = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'halal', 'kosher'];
+          const invalidValues = value.filter(item => !validValues.includes(item));
+          if (invalidValues.length > 0) {
+            throw new Error(`Invalid dietary info values: ${invalidValues.join(', ')}`);
+          }
+        }
+      }
+    }
   },
   storageInstructions: {
     type: DataTypes.TEXT,

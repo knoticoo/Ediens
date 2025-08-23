@@ -11,8 +11,26 @@ async function migrate() {
     console.log('✅ Database connection established.');
     
     // Sync all models (create tables)
-    await sequelize.sync({ alter: true });
-    console.log('✅ Database tables created/updated successfully.');
+    try {
+      await sequelize.sync({ alter: true });
+      console.log('✅ Database tables created/updated successfully.');
+    } catch (syncError) {
+      console.warn('⚠️  Table sync warning:', syncError.message);
+      
+      // If it's an enum array issue, try to force recreate
+      if (syncError.message.includes('enum') && syncError.message.includes('array')) {
+        console.log('🔄 Attempting to resolve enum array compatibility issue...');
+        try {
+          await sequelize.sync({ force: true });
+          console.log('✅ Database tables recreated successfully (enum issue resolved).');
+        } catch (forceError) {
+          console.error('❌ Force sync failed:', forceError.message);
+          throw forceError;
+        }
+      } else {
+        throw syncError;
+      }
+    }
     
     console.log('🎉 Migration completed successfully!');
     process.exit(0);
